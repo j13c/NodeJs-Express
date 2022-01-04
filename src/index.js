@@ -1,32 +1,39 @@
 const colors = require('colors');
 const express = require('express');
+const path = require('path');
+const exphbs = require('express-handlebars');
+const methodOverride = require('method-override');
+const session = require('express-session');
+
+//Initlization
 const app = express();
+
+//Settings
+app.set('port', process.env || 3000); //TODO: dont work
+app.set('views', path.join(__dirname, 'views'));
+app.engine('.hbs', exphbs.engine({
+    defaultLayout:'main',
+    layoutsDir: path.join(app.get('views'),'layouts'),
+    partialsDir: path.join(app.get('views'),'partials'),
+    extname: '.hbs'
+}));
+app.set( 'view engine', '.hbs');
 app.use( express.json() );
 
-app.get('/', (req,res)=>{
-    res.send('Hellow World');
-});
+//Middlewares
+app.use(express.urlencoded({extended: false}) );
+app.use(methodOverride('_method'));
+app.use(session({
+    secret: 'mySecretApp',
+    resave: true,
+    saveUninitialized: true
+}))
 
-function logger(req,res,next){
-    
-    console.log(` ${req.method}  ${req.path}`);
-}
+//Global Variables
 
-app.get('/user', (req,res)=>{
-    res.json({
-        id:1,
-        name:"jean",
-        lastname:"trujillo",
-        age:27
-    });
-});
+//Routes
 
-app.post('/user/:id', (req,res)=>{
-    console.log( req.body );
-    console.log( req.params );
-    res.send('Successfully user');
-});
+//Static Files
 
-app.listen(3000, ()=>{
-    console.log('Server on http://localhost:3000/'.green);
-});
+//Server is listenning
+app.listen(3000, ()=>{ console.log(`Server on http://localhost:3000`.green) });
