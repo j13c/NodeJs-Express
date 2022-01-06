@@ -7,9 +7,10 @@ const session = require('express-session');
 
 //Initlization
 const app = express();
+require('./database');
 
 //Settings
-app.set('port', process.env || 3000); //TODO: dont work
+app.set('port', process.env.port || 3000);
 app.set('views', path.join(__dirname, 'views'));
 app.engine('.hbs', exphbs.engine({
     defaultLayout:'main',
@@ -32,8 +33,11 @@ app.use(session({
 //Global Variables
 
 //Routes
+app.use(require('./routes/index'));
+app.use(require('./routes/notes'));
+app.use(require('./routes/users'));
 
 //Static Files
-
+app.use(express.static(path.join(__dirname, 'public') ));
 //Server is listenning
-app.listen(3000, ()=>{ console.log(`Server on http://localhost:3000`.green) });
+app.listen(app.get('port') , ()=>{ console.log(`Server on http://localhost:${app.get('port')}`.green) });
